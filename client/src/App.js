@@ -1,8 +1,13 @@
+import Header from "./components/Header";
+import GlobalStyles from './components/GlobalStyles';
+import Home from "./components/Home";
 
 const App = () => {
   return (
     <div>
-        Hello!!
+      <GlobalStyles />
+        <Header />
+        <Home />
     </div>
   );
 }
