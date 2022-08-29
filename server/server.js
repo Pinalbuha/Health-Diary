@@ -4,9 +4,12 @@
 const express = require("express");
 //const morgan = require("morgan");
 
-// const {
-    
-// } = require("./handlers");
+const {
+    getAllUsers,
+    getUsersById,
+    addUser,
+    updateUser
+} = require("./handlers");
 
 express()
     // Below are methods that are included in express(). We chain them for convenience.
@@ -22,15 +25,16 @@ express()
     // Nothing to modify above this line
     // ---------------------------------
     
-    .get("/hi", (req,res) =>{
-        res.status(200).json({status: 200, message: "successful"})
-    }) 
+    .get("/api/users", getAllUsers)
+    .get("/api/users/:_id", getUsersById)
+    .post("/api/add-users", addUser)
+    .patch("/api/update-user", updateUser)
     
 
     // ---------------------------------
     // Nothing to modify below this line
 
-    // this is our catch all endpoint.
+   // this is our catch all endpoint.
     .get("*", (req, res) => {
         res.status(404).json({
         status: 404,
