@@ -13,27 +13,32 @@ const containerStyle = {
 const center = {
     lat:  45.421532,
     lng: -75.697189
+
 };
+
 
 const libraries = ["places"];
 //console.log("places", libraries)
 
+
 const Map = () => {
+
     const {isLoaded} = useLoadScript({
         id: 'google-map-script',
         googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         libraries,
     });
 
+    
     const [markers, setMarkers] = useState([]);
     const [selected, setSelected] = useState(null);
 
-    const onMapClick = useCallback((e) => {
-        setMarkers(current => [...current,{
-            lat: e.latLng.lat(),
-            lng:e.latLng.lng()
-        }])
-    }, []);
+    // const onMapClick = useCallback((e) => {
+    //     setMarkers(current => [...current,{
+    //         lat: e.latLng.lat(),
+    //         lng:e.latLng.lng()
+    //     }])
+    // }, []);
 
     const mapRef = useRef();
     const onMapLoad = useCallback((map) => {
@@ -58,7 +63,7 @@ const Map = () => {
         mapContainerStyle={containerStyle} 
         center={center} 
         zoom={8}
-        onClick={onMapClick} 
+        // onClick={onMapClick} 
         onLoad={onMapLoad}
         >
             {/* {markers.map(marker => 
@@ -69,15 +74,14 @@ const Map = () => {
             }}
             /> 
             )} */}
-            {selected && <Marker position={selected}/>}
 
             {selected ? <InfoWindow position={{lat:selected.lat, lng:selected.lng}} onCloseClick={() => {
                 setSelected(null);
             }} >
-                <div>
+                {/* <div>
                     <h1>Doctor</h1>
                     
-                </div>
+                </div> */}
             </InfoWindow> : null}
 
 
@@ -89,25 +93,27 @@ const Map = () => {
 
 }
 
+
+
 const Locate = ({panTo}) => {
     const sucess = (position) => {
 panTo({
     lat: position.coords.latitude,
     lng: position.coords.longitude,
-});
-    }
+});}
+    
 
     return(
         <StyledDiv>
         <button className='locate' onClick={() => {
-            navigator.geolocation.getCurrentPosition(sucess, () => null)
+            navigator.geolocation.getCurrentPosition( () => null)
         }}>
             Locate me
         </button>
         </StyledDiv>
     )
-}
 
+}
 
 
 

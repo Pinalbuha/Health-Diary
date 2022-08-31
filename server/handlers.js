@@ -1,12 +1,11 @@
 "use strict";
 // use this package to generate unique ids: https://www.npmjs.com/package/uuid
-//const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
 const { MongoClient } = require("mongodb");
 
-
-
 require("dotenv").config();
-const { MONGO_URI } = process.env;
+const { MONGO_URI} = process.env;
+
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -20,7 +19,7 @@ const getAllUsers = async (req, res) => {
         
         await client.connect();
         console.log("connected")
-        const db = client.db("health_dairy");
+        const db = client.db("health-dairy");
         const result = await db.collection("users").find().toArray();
         res.status(200).json({status: 200, users:result});
         
@@ -31,41 +30,74 @@ const getAllUsers = async (req, res) => {
     client.close();   
 }
 
+//get user History
+const getUserHistory = async(req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    try {
+        
+        await client.connect();
+        console.log("connected")
+        const db = client.db("health-dairy");
+        const result = await db.collection("history").find().toArray();
+        res.status(200).json({status: 200, users:result});
+        
+       
+        } catch (err) {
+        console.log(err.stack);
+        }
+    client.close(); 
+}
+
+
 // get users by ID
 
 const getUsersById = async (req, res) => {
     const client = new MongoClient(MONGO_URI, options);
     const {_id} = req.params;
-        
+    try{
         await client.connect();
         console.log("connected")
-        const db = client.db("health_dairy");
+        const db = client.db("health-dairy");
         const result = await db.collection("users").findOne({ _id });
         console.log(result)
-
-        result
-    ? res.status(200).json({ status: 200, users: result })
-    : res.status(404).json({ status: 404,  users: "Not Found" });
+        res.status(200).json({ status: 200, users: result })
+    }
+    catch (err){ res.status(404).json({ status: 404,  users: "Not Found" });
+    console.log(err)
+}
 client.close();
 }
 
 //creates new user
-const addUser = async(req, res) => {
+const addUser = async(req, res) => { 
     const client = new MongoClient(MONGO_URI, options);
     //const {first_name, email} = req.body;
-    console.log(req.body);
-    try{    
+    //const result = await db.collection("users").findOne({email});
+    try{
+        //console.log(req.body);  
         await client.connect();
-        console.log("connected")
-        const db = client.db("health_dairy");
-        const result = await db.collection("users").insertOne(req.body);
-        //console.log(result)
-        res.status(200).json({ status: 200, users: req.body })
-    }
-    catch(err){
+        //console.log("connected")
+        const db = client.db("health-dairy");
+        
+        const {email, name} = req.body;
+        const newId = uuidv4;
+        const result = await db.collection("users").findOne({email : req.body.email});
+        const query = { email }
+        const newUserUpdate = {$set: {...req.body}}
+        if(result){        
+            await db.collection("users").updateOne(query, newUserUpdate);
+            console.log(result)
+            return res.status(200).json({ status: 200, users: req.body })
+        }
+        await db.collection("users").insertOne({...req.body, _id:newId});
+        res.status(200).json({status:200, id:newId, data:req.body, message:"success"})
+    }catch(err){
         console.log(err)
     }
-client.close();
+        
+        
+        client.close();
+
     
 }
 
@@ -80,7 +112,7 @@ const updateUser = async(req, res) => {
     try{    
         await client.connect();
         console.log("connected")
-        const db = client.db("health_dairy");
+        const db = client.db("health-dairy");
         const result = await db.collection("users").findOne({id : req.body._id });
         await db.collection("users").updateOne(query, newUserUpdate);
         console.log(result)
@@ -98,5 +130,6 @@ module.exports = {
     getAllUsers,
     getUsersById,
     addUser,
-    updateUser
+    updateUser,
+    getUserHistory
 };

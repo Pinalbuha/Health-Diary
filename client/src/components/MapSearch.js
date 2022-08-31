@@ -3,30 +3,32 @@ import {Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption} 
 
 import styled from 'styled-components';
 
-const Search = ({panTo, setSelected}) => {
+const Search = ({ setSelected, panTo}) => {
     const {ready, value, suggestions: {status, data}, setValue, clearSuggestions} = usePlacesAutocomplete({
         requestOptions: {
-            location: {lat: () => 45.421532,
+            location: { lat: () => 45.421532,
                 lng: () => -75.697189},
                 radius: 200 * 1000,
         },
         
     });
 
-    const handleInput = (e) => {
-        setValue(e.target.value);
-      };
     
       const handleSelect = async (address) => {
         setValue(address, false);
         //console.log(address)
-        clearSuggestions();
+        // const results = await getGeocode({address});
+        // const {lat, lng} = await getLatLng(results[0]);
+        // setSelected({lat, lng})
+         
+
         try{
         
         const results = await getGeocode({address});
         const {lat, lng} = await getLatLng(results[0]);
         panTo({lat, lng});
         //setSelected({lat, lng})
+        clearSuggestions();
         
         console.log(lat , lng)
         }
@@ -38,7 +40,7 @@ const Search = ({panTo, setSelected}) => {
       return (
         <StyledDiv>
         <Combobox onSelect={handleSelect} >
-          <ComboboxInput className='search' value={value} onChange={handleInput} disabled={!ready} />
+          <ComboboxInput className='search' value={value} onChange={(e) => setValue(e.target.value)} disabled={!ready} />
           <ComboboxPopover>
             <ComboboxList>
               {status === "OK" &&
