@@ -41,9 +41,10 @@ const getUserHistory = async(req, res) => {
         const result = await db.collection("history").find().toArray();
         res.status(200).json({status: 200, users:result});
         
-       
+    
         } catch (err) {
         console.log(err.stack);
+
         }
     client.close(); 
 }
@@ -53,20 +54,47 @@ const getUserHistory = async(req, res) => {
 
 const getUsersById = async (req, res) => {
     const client = new MongoClient(MONGO_URI, options);
-    const {_id} = req.params;
-    try{
+    const {email} = req.params;
+    console.log(email)
         await client.connect();
         console.log("connected")
         const db = client.db("health-dairy");
-        const result = await db.collection("users").findOne({ _id });
+        // const result = await db.collection("users").findOne({ email });
+        const result = await db.collection("users").find({email}).toArray();
         console.log(result)
-        res.status(200).json({ status: 200, users: result })
-    }
-    catch (err){ res.status(404).json({ status: 404,  users: "Not Found" });
-    console.log(err)
-}
-client.close();
-}
+        //let userExist = false;
+        // result.forEach((user => {
+        //     if(user.email === req.params.email){
+        //         return userExist = true;
+        //     }
+        // }))
+        if(result.length){
+            res.status(200).json({ status: 200,  data: result[0]
+             })
+        }else{
+            res.status(404).json({message : "User not found", data: {phone: "", height:0, weight:0, age:0, gender: "", address: ""}})
+        }
+        
+        
+            client.close(); 
+        
+        
+
+} 
+    //     console.log(result)
+    //     if(result === null){
+    //         throw new Error("user not found")
+    //     }else{
+    //         res.status(200).json({ status: 200, users: result })
+    //     }
+        
+    // }
+
+    // catch (err){ res.status(404).json({ status: 404,  users: "Not Found" });
+//     // console.log(err)
+// }
+// client.close();
+//}
 
 //creates new user
 const addUser = async(req, res) => { 

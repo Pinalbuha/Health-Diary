@@ -3,50 +3,93 @@ import {Combobox, ComboboxInput, ComboboxPopover, ComboboxList, ComboboxOption} 
 
 import styled from 'styled-components';
 
-const Search = ({ setSelected, panTo}) => {
+const Search = ({  panTo, markerTest}) => {
     const {ready, value, suggestions: {status, data}, setValue, clearSuggestions} = usePlacesAutocomplete({
         requestOptions: {
-            location: { lat: () => 45.421532,
-                lng: () => -75.697189},
-                radius: 200 * 1000,
+            componentRestrictions: { country: "canada" },
+            location: { lat: () =>  45.2826,
+                lng: () => -75.7471},
+                radius: 100 ,
+                // types: ["(cities)"],
+                // fields:["geometry"]
         },
-        
-    });
+
+        debounce: 300
+});
 
     
-      const handleSelect = async (address) => {
-        setValue(address, false);
+      const handleSelect =  ({description}) =>  () => {
+        setValue(description, false);
+        clearSuggestions();
         //console.log(address)
         // const results = await getGeocode({address});
         // const {lat, lng} = await getLatLng(results[0]);
         // setSelected({lat, lng})
-         
-
-        try{
+      
+        getGeocode({address:description})
+        .then(results => getLatLng(results[0]))
+        .then(({lat,lng}) => {
+          panTo({lat,lng})
+          console.log(lat,lng)
+        })
+        .catch(err => {
+          console.log(err)
+        });
+      //   try{
         
-        const results = await getGeocode({address});
-        const {lat, lng} = await getLatLng(results[0]);
-        panTo({lat, lng});
-        //setSelected({lat, lng})
-        clearSuggestions();
+      //   const results = await getGeocode({address});
+      //   const {lat, lng} = await getLatLng(results[0]);
+      //   panTo({lat, lng});
+      //   //setSelected({lat, lng})
+      //   clearSuggestions();
         
-        console.log(lat , lng)
-        }
-        catch(err){
-            console.log(err)
-        }
+      //   console.log(lat , lng)
+      //   }
+      //   catch(err){
+      //       console.log(err)
+      //   }
       };
+      const renderSuggestions = () => 
+
+      data.map(suggestion => {
+          
+         // console.log(suggestion)
+          const {
+        place_id,
+
+        structured_formatting: { main_text, secondary_text }
+      } = suggestion;
+        
+     
+            
+      
+      
+      return (
+        <li key={place_id} onClick={handleSelect(suggestion)}>
+          <strong>{main_text}</strong> <small>{secondary_text}</small>
+        </li>
+      );
+    });
+
     
       return (
         <StyledDiv>
         <Combobox onSelect={handleSelect} >
-          <ComboboxInput className='search' value={value} onChange={(e) => setValue(e.target.value)} disabled={!ready} />
+          <ComboboxInput className='search' value={value} onChange={(e) =>{ 
+            setValue(e.target.value)}
+          
+          
+          } 
+            disabled={!ready} 
+            />
           <ComboboxPopover>
             <ComboboxList>
-              {status === "OK" &&
+              {/* {status === "OK" &&
                 data.map(({ place_id, description }) => (
-                  <ComboboxOption key={place_id} value={description} />
-                ))}
+                  //<ComboboxOption key={place_id} value={description} />
+                ))} */}
+                {status === "OK" && <ul>{renderSuggestions()}</ul>}
+
             </ComboboxList>
           </ComboboxPopover>
         </Combobox>

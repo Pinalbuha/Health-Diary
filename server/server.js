@@ -27,7 +27,7 @@ express()
     // ---------------------------------
     
     .get("/api/users", getAllUsers)
-    .get("/api/users/:_id", getUsersById)
+    .get("/api/users/:email", getUsersById)
     .get("/api/get-history", getUserHistory)
     .post("/api/add-users", addUser)
     .patch("/api/update-user", updateUser)
