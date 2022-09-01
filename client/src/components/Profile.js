@@ -13,9 +13,26 @@ const Profile = () => {
 
     const handleChange = (name, value) => {
         setFormData({...formData, [name]: value});
-        console.log()
         console.log(formData)
     };
+
+    useEffect(() => {
+      { isAuthenticated &&
+      fetch(`/api/users/${user.email}`)
+        .then((res) => res.json())
+
+        .then(data => {
+          console.log(data)
+         
+            setFormData({...formData, address:data.data.address , age:data.data.age})
+          
+          
+        }
+          )
+
+        .catch(err => {console.log(err)})
+    }},[isAuthenticated])
+
 
     const handleSubmit =(e) => {
       console.log(e)
@@ -37,9 +54,13 @@ const Profile = () => {
         .catch((err) => {console.log(err)})
    
      }
-     console.log(user)
+    // console.log(user)
+     //console.log(formData)
     return (
-       isAuthenticated && (
+      <div>
+      
+       {isAuthenticated &&  formData && (
+
         <div>
           <StyledForm onSubmit={ handleSubmit}>
             
@@ -55,7 +76,7 @@ const Profile = () => {
             <label for="fname">Phone no:</label>
             <input type="number" placeholder="Enter Phone"  name={"phone"} onChange={(e) => handleChange("phone",e.target.value)}/>
             <label for="fname">Enter Age</label>
-            <input type="number" placeholder="Enter Age"  name={"age" }onChange={(e) => handleChange("age",e.target.value)}/>
+            <input type="number" placeholder="Enter Age"  name={"age"} value = {formData.age} onChange={(e) => handleChange("age",e.target.value)}/>
             <label for="fname">Enter Gender</label>
             <input type="text" placeholder="Enter Gender"  name={"gender"} onChange={(e) => handleChange("gender",e.target.value)}/>
             <label for="fname">Enter Height</label>
@@ -65,11 +86,13 @@ const Profile = () => {
             <label for="fname">Enter City</label>
             <input type="text" placeholder="Enter City" name={"city"}  onChange={(e) => handleChange("city",e.target.value)}/>
             <label for="fname">Enter Address</label>
-            <input type="text" placeholder="Enter Address" name={"address" } onChange={(e) => handleChange("address",e.target.value)}/>
+            <input type="text" placeholder="Enter Address" name={"address" } value={formData.address} onChange={(e) => handleChange("address",e.target.value)}/>
             <div >
               
-              <button className="button" type="Submit">Submit</button> 
-              <button className="button" type="Submit" >Update</button>
+               {formData === null  ? <button className="button" type="Submit">Submit</button> :
+               <button className="button" type="Submit" >Update</button> }
+               
+             
               
               
 
@@ -82,7 +105,9 @@ const Profile = () => {
           </StyledForm>
         </div>
       )
-     );
+
+       }
+       </div>);
   };
 
 export default Profile;
