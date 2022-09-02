@@ -2,9 +2,7 @@ import Header from "./components/Header";
 import GlobalStyles from './components/GlobalStyles';
 import Home from "./components/Home";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/Login";
 import Profile from "./components/Profile";
-import { useContext, useEffect, useState } from "react";
 import Medical from "./components/Medical";
 
 const App = () => {

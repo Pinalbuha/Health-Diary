@@ -1,23 +1,12 @@
- import Map from "./Map";
-// import MapTest from "./MapTest";
-import Profile from "./Profile";
-
-
+import Map from "./Map";
+//import MapTest from "./MapTest";
 
 const Home = () => {
-    
-    
-
     return(
-        
-            <div>
-                {/* <Profile /> */}
-                
-                <Map />
-                {/* <MapTest /> */}
-            </div>
-
-        
+        <div>
+            <Map />
+            {/* <MapTest /> */}
+        </div>
     )
 }
 

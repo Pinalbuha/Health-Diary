@@ -2,6 +2,7 @@
 // use this package to generate unique ids: https://www.npmjs.com/package/uuid
 const { v4: uuidv4 } = require("uuid");
 const { MongoClient } = require("mongodb");
+const request = require("request-promise");
 
 require("dotenv").config();
 const { MONGO_URI} = process.env;
@@ -30,24 +31,7 @@ const getAllUsers = async (req, res) => {
     client.close();   
 }
 
-//get user History
-const getUserHistory = async(req, res) => {
-    const client = new MongoClient(MONGO_URI, options);
-    try {
-        
-        await client.connect();
-        console.log("connected")
-        const db = client.db("health-dairy");
-        const result = await db.collection("history").find().toArray();
-        res.status(200).json({status: 200, users:result});
-        
-    
-        } catch (err) {
-        console.log(err.stack);
 
-        }
-    client.close(); 
-}
 
 
 // get users by ID
@@ -153,11 +137,75 @@ client.close();
     
 }
 
+//get user History
+const getUserHistory = async(req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const {email} = req.params;
+    console.log(email)
+    try {
+        
+        await client.connect();
+        console.log("connected")
+        const db = client.db("health-dairy");
+        const result = await db.collection("history").find({ email }).toArray();
+        
+        res.status(200).json({status: 200, data:result});
+        
+        } catch (err) {
+        console.log(err.stack);
+
+        }
+    client.close(); 
+}
+
+//add history
+
+const addHistory = async (req,res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    try{
+        //console.log(req.body);  
+        await client.connect();
+        //console.log("connected")
+        const db = client.db("health-dairy");
+        //const newId = uuidv4;
+        const result = await db.collection("history").findOne({email : req.body.email});
+
+        await db.collection("history").insertOne(req.body);
+        res.status(200).json({status:200, data:req.body, message:"success"})
+    }catch(err){
+        console.log(err)
+    }
+        
+        
+        client.close();
+}
+
+// for map api -places
+
+const handleNearby =async (req,res) =>{
+    console.log(req.query.lat)
+
+    try{
+        request(
+           `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${req.query.lat}%2C${req.query.lng}&radius=8000&type=hospital&key=${process.env.GOOGLE_MAPS_API_KEY}`
+          ).then(data => {
+           // console.log(JSON.parse(data))
+            res.status(200).json({status:200, message:"Nearby Data" , data: JSON.parse(data)})
+          })
+
+    
+    }
+    catch(err){
+    res.status(404).json({status:404, message:"Failed"})  
+    }
+}
 
 module.exports = {
     getAllUsers,
     getUsersById,
     addUser,
     updateUser,
-    getUserHistory
+    getUserHistory,
+    addHistory,
+    handleNearby
 };

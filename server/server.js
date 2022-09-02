@@ -9,7 +9,9 @@ const {
     getUsersById,
     addUser,
     updateUser,
-    getUserHistory
+    getUserHistory,
+    addHistory,
+    handleNearby
 } = require("./handlers");
 
 express()
@@ -28,9 +30,11 @@ express()
     
     .get("/api/users", getAllUsers)
     .get("/api/users/:email", getUsersById)
-    .get("/api/get-history", getUserHistory)
+    .get("/api/get-history/:email", getUserHistory)
     .post("/api/add-users", addUser)
+    .post("/api/addHistory", addHistory)
     .patch("/api/update-user", updateUser)
+    .get("/api/place",  handleNearby)  //fetch from places api
     
 
     // ---------------------------------
