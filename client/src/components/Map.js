@@ -1,197 +1,209 @@
 
-import {useLoadScript, GoogleMap, Marker, InfoWindow, PlacesService} from '@react-google-maps/api';
-import { useCallback, useRef, useState } from 'react';
+import {LoadScript,Autocomplete, GoogleMap, Marker,Circle,MarkerClusterer, InfoWindow, PlacesService} from '@react-google-maps/api';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import "@reach/combobox/styles.css"
-import Search from './MapSearch';
+
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 // import usePlacesAutocomplete, {getGeocode, getLatLng } from "use-places-autocomplete";
 
 const containerStyle = {
-    width: '900px',
-    height: '600px',
+    width: '100%',
+    height: 'calc(100vh - 60px)',
     border: '5px solid blue',
     };
-    const options = {
-        disableDefaultUI: true,
-        zoomControl: true
-      };
-const center = {
-    lat:  45.2826,
-    lng: -75.7471
 
-};
+//zoom options
+// const options = {
+//         disableDefaultUI: true,
+//         zoomControl: true
+//     };
 
-let service;
-//const google = window.google
-const libraries = ["places"];
-//console.log("places", libraries)
-
-console.log("google",window.google)
-const Map = () => {
-    console.log("google",window.google)
-    const {isLoaded} = useLoadScript({
-        id: 'google-map-script',
-        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-        libraries,
-    });
-
-    
-   const [markers, setMarkers] = useState([]);
-   const [selected, setSelected] = useState(null);
-    console.log(markers)
-
-    const onMapClick = useCallback((e) => {
-        setMarkers(current => [...current,{
-            lat: e.latLng.lat(),
-            lng:e.latLng.lng()
-        }])
-    }, []);
-    
-   
-
-    const mapRef = useRef();
-    const onMapLoad = useCallback((map) => {
-        mapRef.current = map;
-    }, [])
-
-
-
-    const panTo = useCallback(({lat, lng}) => {
-        mapRef.current.panTo({lat, lng});
-        mapRef.current.setZoom(14);
-        let map = mapRef.current;
-        console.log(map)
-
-    let request = {
-      location: { lat, lng },
-      radius: "100",
-        type: ['doctor']
+// MARKER COMPONENT STYLE 
+// so you must have m1.png, m2.png, m3.png, m4.png, m5.png and m6.png in that folder 
+const markerOptions = {   imagePath:     'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
     };
 
-    service = new window.google.maps.places.PlacesService(mapRef.current);
-    console.log("service",service)
-    service.nearbySearch(request, callback);
-    function callback(results, status) {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-        for (let i = 0; i < results.length; i++) {
-          let place = results[i];
-          console.log("place",place)
-           const marker = new window.google.maps.Marker({
-            position: place.geometry.location,
-            map
-          });
-          console.log(marker)
-          setMarkers([marker,...markers])
-        }
-      }
-    }
-   },[])
+    //CIRCLE COMPONENT STYLE
+const CircleStyles = {
+    strokeColor: '#FF0000',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#FF0000',
+    fillOpacity: 0.35,
+    clickable: false,
+    draggable: false,
+    editable: false,
+    visible: true,
+    radius: 8000, // determines the range of circle
+    zIndex: 1,
+    };
+
+const libraries = ["places"];
+
+const Map = () => {
+    const [selected, setSelected] = useState(null);
+    const[center, setCenter] = useState({ lat:  45.2826, lng: -75.7471 })
+    const [search, setSearch] = useState("")
+    const[array, setArray] = useState("");
+    const [markers, setMarkers] = useState([])
+    const [selectedMarker, setSelectedMarker] = useState("")
+    const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
     
-    // let request = {
-    //     location: center,
-    //     radius: "100",
-    //       type: ['doctor']
-    //   };
-  
-    //   service = new window.google.maps.places.PlacesService(mapRef.current);
-    //   console.log("service",service)
-    //   service.nearbySearch(request, callback);
-    //   function callback(results, status) {
-    //     if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-    //       for (let i = 0; i < results.length; i++) {
-    //         let place = results[i];
-    //         console.log("place",place)
-    //          //createMarker(place)
-    //         //console.log(marker)
-    //         //setMarkers([marker,...markers])
-    //       }
+    useEffect(() => {
+        fetch(`/api/place/?lat=${center.lat}&lng=${center.lng}`,
+        )
+        .then(res => res.json())
+        .then(data => {setMarkers(data.data.results) })
+    }, [center])
 
-    //     }
-    // }
 
-    
+    const onSBLoad = (ref) => {
+        console.log('hello');
+        setArray(ref);
+        console.log(search);
+    };
 
-    if(!isLoaded){
-        return <h1>Loading</h1>;
+
+
+    // const {isLoaded} = useLoadScript({
+    //     id: 'google-map-script',
+    //     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    //     libraries,
+    // });
+
+
+    // if(!isLoaded){
+    //     return <h1>Loading</h1>;
         
-    }
-    
-   
+    // }
 
 
     return (
-        <div>
-            {/* <Search panTo={panTo} markerTest={onMapClick}/>
-            <Locate panTo={panTo}/> */}
-        <GoogleMap 
-        id ="map"
-        mapContainerStyle={containerStyle} 
-        center={center} 
-        zoom={8}
-        onClick={onMapClick} 
-        options={options}
-        onLoad={onMapLoad}
+        <>
+        <LoadScript 
+            libraries={libraries}
+            googleMapsApiKey = {process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
         >
-            {/* {
-            markers.map(marker => 
-               { console.log("marker",marker)
-                return( < Marker position={{lat: marker.lat, lng:marker.lng}} 
 
-            // icon={{url: ""}}
-            onClick={() => {
-                setSelected(marker);
-            }}
-            /> )}
-            )} */}
+            {/* <Search  setSelected={setSelected}/> */}
+        <GoogleMap 
+            mapContainerStyle={containerStyle} 
+            center={center} 
+            zoom={13}
+            // options={options}  
+            >
+            <Autocomplete
+            
+            onLoad={onSBLoad}
+            onPlaceChanged={() => {
 
-            {selected ? <InfoWindow position={{lat:selected.lat, lng:selected.lng}} onCloseClick={() => {
-                setSelected(null);
-            }} > 
-                 <div>
-                    <h1>Doctor</h1>
+                setCenter({
+                  lat: array.getPlace().geometry.location.lat(),
+                  lng: array.getPlace().geometry.location.lng(),
+                });
+                // console.log(array.getPlace().geometry.location.lat());
+                // console.log(array.getPlace().geometry.location.lng());
+              }}
+            >
+
+                <input
+              type='text'
+              placeholder='Customized your placeholder'
+              onChange={(e) => setSearch(e.target.value)}
+              value={search}
+              style={{
+                boxSizing: `border-box`,
+                border: `1px solid transparent`,
+                width:` 240px`,
+                height: `32px`,
+                padding:` 0 12px`,
+                borderRadius:` 3px`,
+                boxShadow:` 0 2px 6px rgba(0, 0, 0, 0.3)`,
+                fontSize:` 14px`,
+                outline: `none`,
+                textOverflow: `ellipses`,
+                position: 'absolute',
+                left: '50%',
+                marginLeft: '-120px',
+                }}
+            />
+            </Autocomplete>
+            <Circle center={center} options={CircleStyles}/>
+            
+            <MarkerClusterer 
+            options={markerOptions}
+
+            >
+                {(clusterer) => 
                     
-                </div>
-            </InfoWindow> : null}
+                    markers.length &&
+                    markers.map((marker, index) => {
+                    //console.log(typeof marker.geometry.location.lng)
+                    return <div key={index}>
+                    <Marker 
+                    position={{
+                        "lat": marker.geometry.location.lat,
+                        "lng": marker.geometry.location.lng
+                    }}
+                    clusterer = {clusterer}
+                    onClick={() => {setSelectedMarker({
+                        marker, index
+                    })}}
+                    >
+                    {selectedMarker.index === index  && (
+                        <InfoWindow position={{ 
+                            "lat": marker.geometry.location.lat,
+                            "lng": marker.geometry.location.lng}}
 
+                            >
+                                <div>
+                                    <h3>{ marker.name}</h3>
+                                    <button onClick={handleShow}> Show info</button>
 
-                </GoogleMap>
+                                </div>
 
-                </div>
+                        </InfoWindow>
+                    )}
+                    </Marker></div>
+                })
+                }
+
+            </MarkerClusterer>
+            
+            {/* {selected && <Marker position={selected} />} */}
+            </GoogleMap>
+
+        </LoadScript>
+
+        {/* //Bootstrap modal */}
+
+        <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+            {console.log(selectedMarker)}
+          <Modal.Title>{selectedMarker ? selectedMarker.marker.name : ''}</Modal.Title>
+          <Modal.Title>{selectedMarker ? "world" : ''}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <button variant='secondary' onClick={handleClose}>
+            Close
+          </button>
+          <button variant='primary' onClick={handleClose}>
+            Save Changes
+          </button>
+        </Modal.Footer>
+      </Modal>
+      </>
     );
 
-
-}
-
-// const createMarker = (place) => {
-//     if (!place.geometry || !place.geometry.location) return;
-//     const marker = new window.google.maps.Marker({
-//         map:mapRef.current,
-//         position: place.geometry.location,
-//       });
-// }
-
-
-// const Locate = ({panTo}) => {
-//     const sucess = (position) => {
-// panTo({
-//     lat: position.coords.latitude,
-//     lng: position.coords.longitude,
-// });}
     
-
-//     return(
-//         <StyledDiv>
-//         {/* <button className='locate' onClick={() => {
-//             navigator.geolocation.getCurrentPosition( () => null)
-//         }}> */}
-//             Locate me
-//         {/* </button> */}
-//         </StyledDiv>
-//     )
-
-// }
-
+}
 
 
 export default Map;
@@ -209,6 +221,7 @@ const StyledDiv = styled.div`
     padding: 10px;
     /* border: 2px solid red; */
 }
+
 
 
 `;
