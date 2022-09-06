@@ -3,6 +3,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { MongoClient } = require("mongodb");
 const request = require("request-promise");
+const multer = require('multer');
 
 require("dotenv").config();
 const { MONGO_URI} = process.env;
@@ -12,7 +13,29 @@ const options = {
     useUnifiedTopology: true,
     };
 
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, 'images/')
+        },
+        filename: (req, file, cb) => {
+          cb(null, file.originalname)
+        },
+      })
+      
+      const upload = multer({ storage: storage })
+
 //endpoints
+
+const addFile = async(req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    await client.connect();
+        console.log("connected")
+        const db = client.db("health-dairy");
+        upload.single('file')
+        res.status(200).json({status: 200})
+}
+
+
 //gets all the users
 const getAllUsers = async (req, res) => {
     const client = new MongoClient(MONGO_URI, options);
@@ -56,7 +79,7 @@ const getUsersById = async (req, res) => {
             res.status(200).json({ status: 200,  data: result[0]
              })
         }else{
-            res.status(404).json({message : "User not found", data: {phone: "", height:0, weight:0, age:0, gender: "", address: ""}})
+            res.status(404).json({message : "User not found", data: {phone: "", height:0, weight:0, age:0, sex: "", address: ""}})
         }
         
         
@@ -183,7 +206,7 @@ const addHistory = async (req,res) => {
 // for map api -places
 
 const handleNearby =async (req,res) =>{
-    console.log(req.query.lat)
+    //console.log(req.query.lat)
 
     try{
         request(
@@ -207,5 +230,6 @@ module.exports = {
     updateUser,
     getUserHistory,
     addHistory,
-    handleNearby
+    handleNearby,
+    addFile
 };

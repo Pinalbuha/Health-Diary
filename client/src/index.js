@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App';
+import { UserProvider } from './components/UserContext';
 
 
 
@@ -16,7 +17,9 @@ root.render(
     clientId="LLhCT9KMHoFBuNV2SBqHOdKVQT4xWKeC"
     redirectUri={window.location.origin}
     >
+    <UserProvider>
     <App />
+    </UserProvider>
     </Auth0Provider>
   
 

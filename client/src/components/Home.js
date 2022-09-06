@@ -1,16 +1,15 @@
+import Main from "./Main";
 import Map from "./Map";
-//import MapTest from "./MapTest";
+
 
 const Home = () => {
     return(
         <div>
+            {/* <Main /> */}
             <Map />
-            {/* <MapTest /> */}
         </div>
     )
 }
-
-
 
 export default Home;
 

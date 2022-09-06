@@ -7,7 +7,7 @@ const LogoutButton = () => {
 
   return (
     <StyledButton onClick={() => logout({ returnTo: window.location.origin })}>
-        Log Out
+        Signout
     </StyledButton>
   );
 };
@@ -15,4 +15,17 @@ const LogoutButton = () => {
 export default LogoutButton;
 
 const StyledButton = styled.div`
+color: white;
+font-size: 30px;
+display: flex;
+align-items: center;
+
+
+ &:hover{
+  background-color:lightgreen ;
+    padding: 5px;
+    border-radius:15px;
+    color: black;
+ }
 `;
+
