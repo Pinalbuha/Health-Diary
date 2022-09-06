@@ -1,17 +1,15 @@
 
 import {LoadScript,Autocomplete, GoogleMap, Marker,Circle,MarkerClusterer, InfoWindow, PlacesService} from '@react-google-maps/api';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import "@reach/combobox/styles.css"
-
 import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-// import usePlacesAutocomplete, {getGeocode, getLatLng } from "use-places-autocomplete";
+import {GiHealthIncrease} from "react-icons/gi"
 
 const containerStyle = {
     width: '100%',
     height: 'calc(100vh - 60px)',
-    border: '5px solid blue',
+   
     };
 
 //zoom options
@@ -20,17 +18,17 @@ const containerStyle = {
 //         zoomControl: true
 //     };
 
+
 // MARKER COMPONENT STYLE 
 // so you must have m1.png, m2.png, m3.png, m4.png, m5.png and m6.png in that folder 
-const markerOptions = {   imagePath:     'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
-    };
+const markerOptions = { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' };
 
-    //CIRCLE COMPONENT STYLE
+//CIRCLE COMPONENT STYLE
 const CircleStyles = {
     strokeColor: '#FF0000',
     strokeOpacity: 0.8,
     strokeWeight: 2,
-    fillColor: '#FF0000',
+    // fillColor: '#FF0000',
     fillOpacity: 0.35,
     clickable: false,
     draggable: false,
@@ -51,13 +49,12 @@ const Map = () => {
     const [selectedMarker, setSelectedMarker] = useState("")
     const [show, setShow] = useState(false);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const iconBase = "https://maps.google.com/mapfiles/kml/shapes/";
 
-    
     useEffect(() => {
-        fetch(`/api/place/?lat=${center.lat}&lng=${center.lng}`,
-        )
+        fetch(`/api/place/?lat=${center.lat}&lng=${center.lng}`)
         .then(res => res.json())
         .then(data => {setMarkers(data.data.results) })
     }, [center])
@@ -68,21 +65,8 @@ const Map = () => {
         setArray(ref);
         console.log(search);
     };
-
-
-
-    // const {isLoaded} = useLoadScript({
-    //     id: 'google-map-script',
-    //     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    //     libraries,
-    // });
-
-
-    // if(!isLoaded){
-    //     return <h1>Loading</h1>;
-        
-    // }
-
+    console.log(markers)
+    
 
     return (
         <>
@@ -91,33 +75,28 @@ const Map = () => {
             googleMapsApiKey = {process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
         >
 
-            {/* <Search  setSelected={setSelected}/> */}
         <GoogleMap 
             mapContainerStyle={containerStyle} 
             center={center} 
-            zoom={13}
+            zoom={12}
             // options={options}  
-            >
-            <Autocomplete
-            
+        >
+        <Autocomplete
             onLoad={onSBLoad}
             onPlaceChanged={() => {
-
-                setCenter({
-                  lat: array.getPlace().geometry.location.lat(),
-                  lng: array.getPlace().geometry.location.lng(),
+            setCenter({
+                lat: array.getPlace().geometry.location.lat(),
+                lng: array.getPlace().geometry.location.lng(),
                 });
-                // console.log(array.getPlace().geometry.location.lat());
-                // console.log(array.getPlace().geometry.location.lng());
-              }}
-            >
+            }}
+        >
 
-                <input
-              type='text'
-              placeholder='Customized your placeholder'
-              onChange={(e) => setSearch(e.target.value)}
-              value={search}
-              style={{
+        <input
+            type='text'
+            placeholder='Customized your placeholder'
+            onChange={(e) => setSearch(e.target.value)}
+            value={search}
+            style={{
                 boxSizing: `border-box`,
                 border: `1px solid transparent`,
                 width:` 240px`,
@@ -131,98 +110,183 @@ const Map = () => {
                 position: 'absolute',
                 left: '50%',
                 marginLeft: '-120px',
+                marginTop: '5px'
                 }}
             />
-            </Autocomplete>
-            <Circle center={center} options={CircleStyles}/>
-            
-            <MarkerClusterer 
+        </Autocomplete>
+        <Circle center={center} options={CircleStyles}/>
+        <MarkerClusterer 
             options={markerOptions}
-
-            >
-                {(clusterer) => 
-                    
-                    markers.length &&
-                    markers.map((marker, index) => {
-                    //console.log(typeof marker.geometry.location.lng)
+        >
+            {(clusterer) => 
+                markers.length &&
+                markers.map((marker, index) => {
                     return <div key={index}>
-                    <Marker 
-                    position={{
-                        "lat": marker.geometry.location.lat,
-                        "lng": marker.geometry.location.lng
-                    }}
-                    clusterer = {clusterer}
-                    onClick={() => {setSelectedMarker({
-                        marker, index
-                    })}}
-                    >
-                    {selectedMarker.index === index  && (
-                        <InfoWindow position={{ 
-                            "lat": marker.geometry.location.lat,
-                            "lng": marker.geometry.location.lng}}
+                       {/* { console.log(marker.photos[0].photo_reference)} */}
+                        <Marker 
+                            position={{
+                                "lat": marker.geometry.location.lat,
+                                "lng": marker.geometry.location.lng,
+                                
+                            }}
 
-                            >
-                                <div>
-                                    <h3>{ marker.name}</h3>
-                                    <button onClick={handleShow}> Show info</button>
-
-                                </div>
-
-                        </InfoWindow>
-                    )}
-                    </Marker></div>
+                            clusterer = {clusterer}
+                            onClick={() => {setSelectedMarker({
+                                marker, index
+                            })}}
+                        >
+                            {selectedMarker.index === index  && (
+                                <InfoWindow position={{ 
+                                    "lat": marker.geometry.location.lat,
+                                    "lng": marker.geometry.location.lng}}
+                                    >
+                                    <StyledDiv>
+                                        
+                                        <h3>{ marker.name}</h3>
+                                        <div className='markerdiv'> {marker.rating} stars</div>
+                                        <div className='markerdiv'> Image
+                                            {
+                                                marker.photos === undefined ? "No Photos" : 
+                                                <img src={`https://maps.googleapis.com/maps/api/place/photo?photoreference=${marker.photos[0].photo_reference}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&maxwidth=400&maxheight=400`}/>
+                                            }
+                                        </div>
+                                        <div className='markerdiv'>{marker.user_ratings_total} Reviews</div>
+                                        <p></p>
+                                        <button className='button' onClick={handleShow}> Show info</button>
+                                    </StyledDiv>
+                                </InfoWindow>
+                            )}
+                        </Marker></div>
                 })
-                }
+            }
 
-            </MarkerClusterer>
-            
-            {/* {selected && <Marker position={selected} />} */}
-            </GoogleMap>
-
+        </MarkerClusterer>
+        </GoogleMap>
         </LoadScript>
 
         {/* //Bootstrap modal */}
-
-        <Modal show={show} onHide={handleClose}>
+        
+        <Modal show={show} onHide={handleClose} >
+        <ModalHead>
         <Modal.Header closeButton>
-            {console.log(selectedMarker)}
-          <Modal.Title>{selectedMarker ? selectedMarker.marker.name : ''}</Modal.Title>
-          <Modal.Title>{selectedMarker ? "world" : ''}</Modal.Title>
+            <ModalDiv>
+            {/* {console.log(selectedMarker)} */}
+            {/* Image */}
+                <Modal.Title>{selectedMarker ? selectedMarker.marker.name : ''}</Modal.Title>
+            </ModalDiv>
         </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-        <Modal.Footer>
-          <button variant='secondary' onClick={handleClose}>
-            Close
-          </button>
-          <button variant='primary' onClick={handleClose}>
-            Save Changes
-          </button>
-        </Modal.Footer>
-      </Modal>
-      </>
-    );
-
-    
+        <ModalBodyDiv>
+        <Modal.Body>{selectedMarker ? selectedMarker.marker.vicinity : ''}</Modal.Body>
+        <Modal.Body>{selectedMarker && 
+        <div>
+            {
+                selectedMarker.marker.opening_hours === undefined ? "" :
+                selectedMarker.marker.opening_hours.open_now === false ? ' Closed Now' : 'Open Now'
+            }
+        </div>
 }
-
+            
+            {/* // selectedMarker.marker.opening_hours.open_now === false ? ' Closed Now' : 'Open Now'}}*/}
+            </Modal.Body>       
+        </ModalBodyDiv>
+        
+        <Modal.Footer>
+            <ModalButton>
+            <button className='button' onClick={handleClose}>
+                Close
+            </button>
+            {/* <button onClick={handleClose}>
+            Save Changes
+            </button> */}
+            </ModalButton>
+        </Modal.Footer>
+        </ModalHead>
+        </Modal>
+        
+        </>
+    );
+}
 
 export default Map;
 
-
 const StyledDiv = styled.div`
+display: flex;
+flex-direction: column;
+height:150px;
+font-size: 12px;
+gap: 3px;
 
-.locate {
-    position: absolute;
-    top:  5rem;
-    right: 50rem;
-    background: white;
-    z-index: 10;
-    border-radius: 15px;
-    padding: 10px;
-    /* border: 2px solid red; */
+img{
+    width: 100px;
+    height: 100px;
 }
 
+.button{
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: green;
+    color:white;
+    width: 80px;
+}
 
+.markerdiv{
+font-size:15px;
+font-weight: bold;
+}
 
 `;
 
+const ModalDiv = styled.div`
+
+
+/* padding:10px; */
+font-size: 25px;
+display: flex;
+align-items: center;
+justify-content: center;
+
+`;
+
+const ModalBodyDiv = styled.div`
+
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+width:500px;
+height: 100px;
+
+/* padding:10px; */
+font-size: 20px;
+`;
+
+const ModalHead = styled.div`
+
+height:400px;
+background-color: whitesmoke;
+padding:15px;
+width:500px;
+position: absolute;
+top: 250px;
+left:550px;
+display: flex;
+flex-direction: column;
+color: black;
+border-radius: 15px;
+`;
+
+const ModalButton = styled.div`
+display: flex;
+color:red;
+border: none;
+
+.button{
+    display: flex;
+color:red;
+border: none;
+padding: 10px;
+font-size: 20px;
+border-radius: 15px;
+}
+`;

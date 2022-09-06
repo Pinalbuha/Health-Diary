@@ -11,4 +11,8 @@ export default LoginButton;
 
 const StyledButton = styled.div`
 
+color: white;
+font-size: 30px;
+display: flex;
+align-items: center;
 `;

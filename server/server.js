@@ -11,7 +11,8 @@ const {
     updateUser,
     getUserHistory,
     addHistory,
-    handleNearby
+    handleNearby,
+    addFile
 } = require("./handlers");
 
 express()
@@ -35,6 +36,7 @@ express()
     .post("/api/addHistory", addHistory)
     .patch("/api/update-user", updateUser)
     .get("/api/place",  handleNearby)  //fetch from places api
+    .post("/api/image" , addFile)
     
 
     // ---------------------------------
