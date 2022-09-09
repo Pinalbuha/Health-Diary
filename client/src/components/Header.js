@@ -20,6 +20,7 @@ const Header = () => {
                         <Link to="/medical"><TbReportMedical />History</Link> 
                     </>
                     }
+                    
                 {user ? <LogoutButton /> : <LoginButton />}
                 
                 </div>

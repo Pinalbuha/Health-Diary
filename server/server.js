@@ -12,7 +12,7 @@ const {
     getUserHistory,
     addHistory,
     handleNearby,
-    addFile
+    deleteHistory
 } = require("./handlers");
 
 express()
@@ -29,14 +29,14 @@ express()
     // Nothing to modify above this line
     // ---------------------------------
     
-    .get("/api/users", getAllUsers)
+    .get("/api/users", getAllUsers) 
     .get("/api/users/:email", getUsersById)
     .get("/api/get-history/:email", getUserHistory)
     .post("/api/add-users", addUser)
     .post("/api/addHistory", addHistory)
     .patch("/api/update-user", updateUser)
     .get("/api/place",  handleNearby)  //fetch from places api
-    .post("/api/image" , addFile)
+    .delete("/api/deleteHistory/:email", deleteHistory)
     
 
     // ---------------------------------

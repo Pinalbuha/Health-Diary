@@ -16,7 +16,7 @@ const App = () => {
             <Route exact={true} path="/profile"  element={<Profile />} />
             <Route exact={true} path="/medical"  element={<Medical />} />
           </Routes>
-          <Footer />
+          {/* <Footer /> */}
     </Router>
   );
 }

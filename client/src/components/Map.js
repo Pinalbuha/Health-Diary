@@ -6,6 +6,7 @@ import "@reach/combobox/styles.css"
 import Modal from "react-bootstrap/Modal";
 import {GiHealthIncrease} from "react-icons/gi"
 
+
 const containerStyle = {
     width: '100%',
     height: 'calc(100vh - 60px)',
@@ -40,6 +41,7 @@ const CircleStyles = {
 
 const libraries = ["places"];
 
+//map function
 const Map = () => {
     const [selected, setSelected] = useState(null);
     const[center, setCenter] = useState({ lat:  45.2826, lng: -75.7471 })
@@ -52,7 +54,7 @@ const Map = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const iconBase = "https://maps.google.com/mapfiles/kml/shapes/";
-
+    //Fetching places data
     useEffect(() => {
         fetch(`/api/place/?lat=${center.lat}&lng=${center.lng}`)
         .then(res => res.json())
@@ -143,14 +145,20 @@ const Map = () => {
                                     <StyledDiv>
                                         
                                         <h3>{ marker.name}</h3>
-                                        <div className='markerdiv'> {marker.rating} stars</div>
-                                        <div className='markerdiv'> Image
+                                        
+                                        <div className='markerdiv'>
                                             {
-                                                marker.photos === undefined ? "No Photos" : 
+                                                marker.photos === undefined ? "No Photos Available" : 
                                                 <img src={`https://maps.googleapis.com/maps/api/place/photo?photoreference=${marker.photos[0].photo_reference}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&maxwidth=400&maxheight=400`}/>
                                             }
                                         </div>
-                                        <div className='markerdiv'>{marker.user_ratings_total} Reviews</div>
+                                        <div className='markerdiv'> 
+                                        {marker.rating ===  undefined ? " No Ratings Yet" :  `${marker.rating}  stars`}
+                                        </div>
+                                        <div className='markerdiv'>
+                                        {marker.user_ratings_total ===  undefined ? " No Reviews Yet" :  `${marker.user_ratings_total}  Reviews`}
+                                            </div>
+
                                         <p></p>
                                         <button className='button' onClick={handleShow}> Show info</button>
                                     </StyledDiv>
@@ -186,8 +194,17 @@ const Map = () => {
         </div>
 }
             
-            {/* // selectedMarker.marker.opening_hours.open_now === false ? ' Closed Now' : 'Open Now'}}*/}
-            </Modal.Body>       
+            </Modal.Body> 
+            {/* <Modal.Body>
+                {selectedMarker && 
+                <div>
+                    {
+                selectedMarker.photos === undefined ? "No Photos Available" : 
+            <img src={`https://maps.googleapis.com/maps/api/place/photo?photoreference=${selectedMarker.photos[0].photo_reference}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&maxwidth=400&maxheight=400`}/>
+                    }
+        </div>}
+        </Modal.Body> */}
+
         </ModalBodyDiv>
         
         <Modal.Footer>
@@ -212,13 +229,14 @@ export default Map;
 const StyledDiv = styled.div`
 display: flex;
 flex-direction: column;
-height:150px;
+height:250px;
+width:200px;
 font-size: 12px;
 gap: 3px;
 
 img{
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 150px;
 }
 
 .button{
@@ -234,6 +252,8 @@ img{
 font-size:15px;
 font-weight: bold;
 }
+
+
 
 `;
 
@@ -254,19 +274,25 @@ display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-width:500px;
-height: 100px;
-
+/* width:500px;
+height: 100px; */
+gap:5px;
 /* padding:10px; */
 font-size: 20px;
+
+
+.image{
+    height: 250px;
+    width: 350px;
+}
 `;
 
 const ModalHead = styled.div`
 
-height:400px;
+height:300px;
 background-color: whitesmoke;
 padding:15px;
-width:500px;
+width:400px;
 position: absolute;
 top: 250px;
 left:550px;
@@ -280,6 +306,8 @@ const ModalButton = styled.div`
 display: flex;
 color:red;
 border: none;
+align-items: center;
+justify-content: center;
 
 .button{
     display: flex;

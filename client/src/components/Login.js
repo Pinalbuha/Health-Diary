@@ -10,9 +10,16 @@ const LoginButton = () => {
 export default LoginButton;
 
 const StyledButton = styled.div`
-
+cursor: pointer;
 color: white;
 font-size: 30px;
 display: flex;
 align-items: center;
+
+&:hover{
+  background-color:lightgreen ;
+    padding: 5px;
+    border-radius:15px;
+    color: black;
+ }
 `;

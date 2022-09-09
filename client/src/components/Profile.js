@@ -12,13 +12,18 @@ const Profile = () => {
     const [statusMessage, setStatusMessage]= useState("")
     const {historyData, setHistoryData} =useContext(UserContext);
 
+  //Shows success message
+  const handleSuccessMessage = () => {
+    window.alert("Successful")
+  }
+
+  //For the Input data
     const handleChange = (name, value) => {
         setFormData({...formData, [name]: value});
         console.log(formData)
     };
 
-    
-
+    //Fetching users data based on email
     useEffect(() => {
       { isAuthenticated &&
       fetch(`/api/users/${user.email}`)
@@ -29,7 +34,7 @@ const Profile = () => {
       .catch(err => {console.log(err)})
       }},[isAuthenticated])
 
-
+      //Function for posting users data
     const handleSubmit =(e) => {
       e.preventDefault();
       fetch("/api/add-users", {
@@ -44,38 +49,29 @@ const Profile = () => {
       .then((data) => { console.log(data)})
       .catch((err) => {console.log(err)})
       }
-    console.log(user)
+
     return (
-      <div>
+      <StyledDiv>
         {isAuthenticated &&  formData &&
-        <div>
-          <StyledForm onSubmit={ handleSubmit}>
-            <div className="main">
-              <div className="mainDiv"  >
-                
-                <div className="subHead">
-                  {/* <h3>User Profile</h3> */}
-                  <h3><img src={user.picture} className="img"/> {` ${user.given_name}'s Profile`}</h3>
-                  
+          <div className="mainDiv">
+            <form onSubmit={ handleSubmit}>
+              <div className="subHead">
+                <h3><img src={user.picture} className="img"/> {` ${user.given_name}'s Profile`}</h3>
               </div>
-              {/* { user.given_name === undefined ? <h1 className="secondMain">{`Hello ${user.nickname.toUpperCase()}`}</h1> :
-            <h1 className="secondMain">{`Hello ${user.given_name}`}</h1> }
-            <p className="para">This is your profile page</p> */}
-            </div>
-            <div className="formDetails">
-            <h3 className="formHeading">Personal Information</h3>
-            <div className="subForm">
+              <div className="main">
+              <div className="formDetails">
+              <h3 className="formHeading">Personal Information</h3>
+              <div className="subForm">
               <div className="firstInput">
                 <div className="input">
-                <label for="fname">User name:</label>
-          
-                <input type="text" placeholder="Enter Your Name" name={"name"} value={user.name}  onChange={(e) => handleChange("name",e.target.value)}/>
+                  <label for="fname">User name:</label>
+                  <input type="text" placeholder="Enter Your Name" name={"name"} value={user.name}  onChange={(e) => handleChange("name",e.target.value)}/>
                 </div>
                 <div className="input">
-                <label for="fname">Email:</label>
-                <input type="email" placeholder="Enter Email" value={user.email} name={"email" }onChange={(e) => handleChange("email",e.target.value)}/>
+                  <label for="fname">Email:</label>
+                  <input type="email" placeholder="Enter Email" value={user.email} name={"email" }onChange={(e) => handleChange("email",e.target.value)}/>
                 </div>
-            </div>
+                </div>
             <div className="firstInput">
                 <div className="input">
                 <label for="fname">First name:</label>
@@ -90,7 +86,7 @@ const Profile = () => {
             <div className="firstInput">
             <div className="input">
             <label for="fname">Enter Sex</label>
-            <input type="text" placeholder="Enter Sex"  name={"sex"} value = {formData.gender} onChange={(e) => handleChange("sex",e.target.value)}/>
+            <input type="text" placeholder="Enter Sex"  name={"sex"} value = {formData.sex} onChange={(e) => handleChange("sex",e.target.value)}/>
             </div>
                 <div className="input">
                 <label for="fname">Enter Age</label>
@@ -144,13 +140,9 @@ const Profile = () => {
                 </div>
                 
           </div>
-            
-            
-            
-      
                       <div>
               {formData === ""  ? <button className="button" type="Submit" >Submit</button> :
-              <button className="button" type="Submit" >Update</button> }
+              <button className="button" type="Submit" onClick={handleSuccessMessage} >Update</button> }
 
             </div>
             </div>
@@ -161,64 +153,55 @@ const Profile = () => {
             <img className="image" src={user.picture} />
             <div>
               <h3 className="formHeading">Your Medical Info</h3>
-              <div>
-                    {historyData && <div>
-                        {historyData.map(history => {
-                            return 
-                            <div>{history.vaccine.map(vac => {
+              <div className="medicalInfo">
+              {historyData && <div>
+                        {historyData.map(medicine => {
+                            return <div>
+                            <div>{medicine.vaccine.map(vac => {
                                 return (
                                     <div>{vac}</div>
                                 )
                             })}</div>
-                            
+                            </div>
                         })}
                     </div> }
 
               </div>
               <Link to="/medical" >Click here to get more details</Link>
-
-
             </div>
           </div>
-          
-
             </div>
-          </StyledForm>
+          </form>
         </div>
       // ): (<div><h3>Sign In to use this feature</h3></div>
     }
-      </div>
+      </StyledDiv>
   )};
 
 export default Profile;
 
-const StyledForm = styled.form`
-
-
-.mainDiv{
-  
-  display: flex;
-  flex-direction: column;
+const StyledDiv = styled.div`
+  background: linear-gradient(180deg, hsla(112, 23%, 40%, 1) 22%, hsla(42, 100%, 66%, 1) 100%);
   font-size: 20px;
   font-weight: bold;
-  height: 150vh;
-  color: white;
-  /* position: relative; */
-/* background: rgb(63,94,251);
-background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(4,6,24,1) 100%); */
-background: linear-gradient(180deg, hsla(112, 23%, 40%, 1) 22%, hsla(42, 100%, 66%, 1) 100%);
+  
+.main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 30px;
+
 
 }
-
-
 
 
 .subHead{
   color: #DCB13B;
   padding: 5px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 20px;
+  flex-direction: column;
   
 }
 
@@ -259,13 +242,15 @@ justify-content: center;
   display: flex;
   flex-direction: column;
   width:400px;
-  position: absolute;
-  
-  transform: translate(950px, -850px);
   height:400px;
   box-shadow: 1px 1px 5px 3px #B8BAD6;
   background-color: #DCB13B;
   border: 5px solid #072b04;
+  color:#072b04 ;
+}
+
+.medicalInfo{
+  font-size: 20px;
 }
 
 .image{
@@ -280,11 +265,7 @@ justify-content: center;
   border: 5px solid #072b04;
   display: flex;
   flex-direction: column;
-  width:800px;
-  
-  position: absolute;
-  transform: translate(50px, -850px);
-  /* background-color: white; */
+  width:750px;
   border-radius: 15px;
   padding: 15px;
   box-shadow: 1px 1px 5px 3px #B8BAD6;
@@ -300,12 +281,10 @@ justify-content: center;
   
 }
 .formDetails label{
-  
   font-size: 20px;
   color: #072b04;
   display: flex;
   width: 50%;
-  
   
 }
 
@@ -324,7 +303,6 @@ justify-content: center;
 }
 
 .firstInput{
-  
   display: flex;
   gap: 30px;
 }
