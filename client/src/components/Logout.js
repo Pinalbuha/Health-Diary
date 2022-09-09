@@ -19,7 +19,7 @@ color: white;
 font-size: 30px;
 display: flex;
 align-items: center;
-
+cursor: pointer;
 
  &:hover{
   background-color:lightgreen ;
